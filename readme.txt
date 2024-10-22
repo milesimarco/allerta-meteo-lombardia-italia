@@ -1,7 +1,7 @@
 ﻿=== Allerta Meteo Lombardia ===
 Contributors: Milmor
-Version:	1.5.3
-Stable tag:	1.5.3
+Version:	1.5.5
+Stable tag:	1.5.5
 Author:		Marco Milesi
 Author URI:   https://profiles.wordpress.org/milmor/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F2JK36SCXKTE2
