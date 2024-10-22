@@ -1,21 +1,21 @@
 ﻿=== Allerta Meteo Lombardia ===
 Contributors: Milmor
-Version:	1.5.2
-Stable tag:	1.5.2
+Version:	1.5.3
+Stable tag:	1.5.3
 Author:		Marco Milesi
 Author URI:   https://profiles.wordpress.org/milmor/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F2JK36SCXKTE2
 Tags: allerta,meteo,lombardia,italia
 Requires at least: 3.8
-Tested up to: 6.1
+Tested up to: 6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Allerta Meteo Lombardia Italia
+Sistema di visualizzazione allerte meteo per la Regione Lombardia
 
 == Description ==
 
-> This plugin is developed for Italy 
+> This plugin is developed and intended to be used in Italy 
 
 Plugin per la visualizzazione delle allerte meteo di [Regione Lombardia](https://goo.gl/Z9MGto)
 
@@ -44,6 +44,9 @@ This section describes how to install the plugin and get it working.
 Puoi mostrare i dati di allerta meteo con lo shortcode [amli id="XX"] dove XX è il numero dell'area omogenea identificata da Regione Lombardia nel [D.g.r. del 17 dicembre 2015 ](https://goo.gl/ZnShtr) (01, 02, ... 13, 14)
 
 == Changelog ==
+
+= 1.5.3 2024-10-22 =
+* Compability check
 
 = 1.5.2 20220817 =
 * Compability check
