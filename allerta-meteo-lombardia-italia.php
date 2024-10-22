@@ -2,7 +2,7 @@
 /*
 Plugin Name:  Allerta Meteo Lombardia Italia
 Description:  Visualizzatore di allerte meteo collegato con il portale di Regione Lombardia
-Version:      1.5.3
+Version:      1.5.5
 Author:       Marco Milesi
 Contributors: Milmor
 */
