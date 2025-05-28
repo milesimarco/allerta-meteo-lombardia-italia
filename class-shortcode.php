@@ -1,68 +1,137 @@
 <?php
-    
-    extract(shortcode_atts(
-        array(
+
+class AMLI_Shortcode {
+    private $atts;
+    private $results;
+    private $alerts;
+
+    public function __construct() {
+        add_shortcode('amli', array($this, 'render_shortcode'));
+    }
+
+    public function render_shortcode($atts) {
+        $this->atts = shortcode_atts(array(
             'id' => '0',
             'height' => '',
             'width' => '100%',
             'title' => ''
-        ),
-        $atts)
-    );
+        ), $atts);
 
+        if (!$this->atts['id']) {
+            return 'error: ID not provided';
+        }
 
-    if (!$id) { echo 'NO ID FOUND'; return; }
+        // Run the scraper
+        amli_scrape();
 
-    amli_scrape();
+        $this->results = get_option('amli_' . $this->atts['id']);
+        
+        if (!$this->results || !is_array($this->results)) {
+            return '<div style="color:red;">Dati non disponibili. Riprova più tardi.</div>';
+        }
 
-    $results = get_option( 'amli_'.$id );
+        $this->process_alerts();
+        return $this->generate_table();
+    }
 
-    $res = amli_get_alert_display( $results['idrogeologico'] );
-    $idro = $res[0];
-    $idro_c = $res[1];
+    private function process_alerts() {
+        $this->alerts = array(
+            'idrogeologico' => $this->get_safe_alert_display('idrogeologico'),
+            'idraulico' => $this->get_safe_alert_display('idraulico'),
+            'temporali' => $this->get_safe_alert_display('temporali'),
+            'vento' => $this->get_safe_alert_display('vento')
+        );
+    }
 
-    $res = amli_get_alert_display( $results['idraulico'] );
-    $idra = $res[0];
-    $idra_c = $res[1];
+    private function get_safe_alert_display($key) {
+        if (isset($this->results[$key])) {
+            $res = amli_get_alert_display($this->results[$key]);
+            return $res;
+        }
+        return array('N/D', '#ccc');
+    }
 
-    $res = amli_get_alert_display( $results['temporali'] );
-    $tempo = $res[0];
-    $tempo_c = $res[1];
+    private function generate_table() {
+        ob_start();
+        ?>
+        <style>
+            .amli-table {
+                border-collapse: collapse;
+                width: <?php echo esc_attr($this->atts['width']); ?>;
+                <?php if ($this->atts['height']): ?>
+                height: <?php echo esc_attr($this->atts['height']); ?>;
+                <?php endif; ?>
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+                margin: 1em 0;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            .amli-table th, .amli-table td {
+                padding: 12px;
+                border: 1px solid #ddd;
+            }
+            .amli-table thead th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+                text-align: left;
+            }
+            .amli-table tbody th {
+                font-weight: normal;
+                text-align: left;
+            }
+            .amli-table .amli-footer {
+                font-size: 0.85em;
+                color: #666;
+                padding: 8px 12px;
+            }
+            .amli-table .amli-footer a {
+                color: #0073aa;
+                text-decoration: none;
+            }
+            .amli-table .amli-footer a:hover {
+                text-decoration: underline;
+            }
+        </style>
+        <table class="amli-table">
+            <thead>
+                <tr>
+                    <th><?php echo amli_get_paesi($this->atts['id']); ?> (IM-<?php echo esc_html($this->atts['id']); ?>)</th>
+                    <th>Criticità</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($this->alerts as $type => $data): 
+                    list($value, $color) = $data;
+                    $label = $this->get_alert_label($type);
+                ?>
+                <tr>
+                    <th scope="row"><?php echo esc_html($label); ?></th>
+                    <td bgcolor="<?php echo esc_attr($color); ?>" style="text-align: center; font-weight: bold;">
+                        <?php echo esc_html($value); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="2" class="amli-footer">
+                        Ultimo aggiornamento: <?php echo date('H:i', get_option('amli_last_update')); ?> - 
+                        Dati a cura di <a href="https://www.allertalom.regione.lombardia.it/" title="Allerte meteo Regione Lombardia">Regione Lombardia</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <?php
+        return ob_get_clean();
+    }
 
-    $res = amli_get_alert_display( $results['vento'] );
-    $vento = $res[0];
-    $vento_c = $res[1];
+    private function get_alert_label($type) {
+        $labels = array(
+            'idrogeologico' => 'Idrogeologico',
+            'idraulico' => 'Idraulico',
+            'temporali' => 'Temporali Forti',
+            'vento' => 'Vento'
+        );
+        return isset($labels[$type]) ? $labels[$type] : ucfirst($type);
+    }
+}
 
-    echo '
-    <table>
-    <thead>
-        <tr>
-            <th>'.amli_get_paesi($id).' (IM-'.$id.')</th>
-            <th>Criticità</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th scope="row">Idrogeologico</th>
-            <td bgcolor="'.$idro_c.'" style="text-align: center;">'.$idro.'</td>
-        </tr>
-        <tr>
-            <th scope="row">Idraulico</th>
-            <td bgcolor="'.$idra_c.'" style="text-align: center;">'.$idra.'</td>
-        </tr>
-        <tr>
-            <th scope="row">Temporali Forti</th>
-            <td bgcolor="'.$tempo_c.'" style="text-align: center;">'.$tempo.'</td>
-        </tr>
-        <tr>
-            <th scope="row">Vento</th>
-            <td bgcolor="'.$vento_c.'" style="text-align: center;">'.$vento.'</td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <small>Ultimo aggiornamento: '.date('H:i', get_option( 'amli_last_update' )).' - Dati a cura di <a href="https://www.allertalom.regione.lombardia.it/" title="Allerte meteo Regione Lombardia">Regione Lombardia</a></small>
-            </td>
-        </tr>
-    </tbody>
-</table>';
-?>
+// Initialize the shortcode
+new AMLI_Shortcode();

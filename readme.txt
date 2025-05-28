@@ -1,80 +1,101 @@
 ﻿=== Allerta Meteo Lombardia ===
 Contributors: Milmor
-Version:	1.5.5
-Stable tag:	1.5.5
-Author:		Marco Milesi
-Author URI:   https://profiles.wordpress.org/milmor/
+Version: 2.0
+Stable tag: 2.0
+Author: Marco Milesi
+Author URI: https://profiles.wordpress.org/milmor/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F2JK36SCXKTE2
-Tags: allerta,meteo,lombardia,italia
+Tags: allerta, meteo, lombardia, italia, weather, alerts
 Requires at least: 3.8
-Tested up to: 6.7
+Tested up to: 6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Sistema di visualizzazione allerte meteo per la Regione Lombardia
+Sistema avanzato per la visualizzazione delle allerte meteo ufficiali della Regione Lombardia.
 
 == Description ==
 
-> This plugin is developed and intended to be used in Italy 
+> This plugin is developed and intended to be used in Italy.
 
-Plugin per la visualizzazione delle allerte meteo di [Regione Lombardia](https://goo.gl/Z9MGto)
+Allerta Meteo Lombardia permette di visualizzare in tempo reale lo stato delle allerte meteo emesse da Regione Lombardia, tramite una tabella chiara che mostra i rischi per ogni zona omogenea:
 
-Lo stato di allerta è visualizzato tramite una tabella che mostra i vari rischi di una zona omogenea:
+- Idrogeologico
+- Idraulico
+- Temporali forti
+- Vento forte
 
-* idrogeologico
-* idraulico
-* temporali forti
-* vento forte
+L'elenco dei comuni e delle relative zone omogenee è disponibile nella [D.g.r. del 17 dicembre 2015](https://goo.gl/ZnShtr).
 
-L'elenco dei paesi e della relativa zona omogena è disponibile nella [D.g.r. del 17 dicembre 2015 ](https://goo.gl/ZnShtr)
+**Funzionalità principali:**
+- Shortcode personalizzabile per mostrare le allerte di una specifica zona
+- Dashboard amministrativa per monitorare tutte le allerte
+- Nuova codifica zone aggiornata secondo le direttive regionali
+- Design moderno e responsive
+- Sicurezza migliorata
 
-* [Istruzioni di installazione](https://wordpress.org/plugins/allerta-meteo-lombardia-italia/installation)
-* [Istruzioni di utilizzo](https://wordpress.org/plugins/allerta-meteo-lombardia-italia/faq)
+**Risorse utili:**
+- [Istruzioni di installazione](https://wordpress.org/plugins/allerta-meteo-lombardia-italia/installation)
+- [FAQ e guida all'uso](https://wordpress.org/plugins/allerta-meteo-lombardia-italia/faq)
+- Bot Telegram: [@AllertaMeteoLombardia_bot](http://t.me/AllertaMeteoLombardia_bot)
 
-Abbiamo costruito anche un bot per [Telegram @AllertaMeteoLombardia_bot](http://t.me/AllertaMeteoLombardia_bot)
 == Installation ==
-This section describes how to install the plugin and get it working.
 
-1. Upload `allerta-meteo-lombardia-italia` directory to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
+1. Carica la cartella `allerta-meteo-lombardia-italia` nella directory `/wp-content/plugins/` del tuo sito WordPress.
+2. Attiva il plugin dal menu 'Plugin' di WordPress.
+3. Inserisci lo shortcode desiderato nelle tue pagine o articoli.
 
 == Frequently Asked Questions ==
 
-= Shortcode disponibili =
-Puoi mostrare i dati di allerta meteo con lo shortcode [amli id="XX"] dove XX è il numero dell'area omogenea identificata da Regione Lombardia nel [D.g.r. del 17 dicembre 2015 ](https://goo.gl/ZnShtr) (01, 02, ... 13, 14)
+= Quali shortcode sono disponibili? =
+Puoi mostrare i dati di allerta meteo con lo shortcode:
+``[amli id="XX"]``
+dove XX è il numero dell'area omogenea identificata da Regione Lombardia nel [D.g.r. del 17 dicembre 2015](https://goo.gl/ZnShtr) (es: 01, 02, ... 13, 14).
+
+= Dove trovo la lista delle zone e dei comuni? =
+Consulta la [D.g.r. del 17 dicembre 2015](https://goo.gl/ZnShtr) per l'elenco aggiornato.
+
+= Il plugin funziona solo in Lombardia? =
+Sì, il plugin è specifico per le allerte meteo della Regione Lombardia.
 
 == Changelog ==
 
+= 2.0 2025-05-28 =
+* Compatibility check
+* Security improvement
+* New shortcode design
+* New admin dashboard to check all weather alerts
+* New zone codes (as per regional new codification)
+
 = 1.5.3 2024-10-22 =
-* Compability check
+* Compatibility check
 
-= 1.5.2 20220817 =
-* Compability check
+= 1.5.2 2022-08-17 =
+* Compatibility check
 * Under the hood improvements
 
-= 1.5.1 20220312 =
-* Compability check
+= 1.5.1 2022-03-12 =
+* Compatibility check
 * Under the hood improvements
 
-= 1.5 20201115 =
+= 1.5 2020-11-15 =
 * Support for new AllertaLOM
 * Under the hood improvements
 
-= 1.4.1 20200515 =
+= 1.4.1 2020-05-15 =
 * Improved custom functions handling
 * Minor changes
 
-= 1.4 03.03.2020 =
+= 1.4 2020-03-03 =
 * Miglioramenti grafici
 * Inserito bypass SSL
 * Miglioramenti performance
 
-= 1.3.1 23.03.2017 =
+= 1.3.1 2017-03-23 =
 * Bugfix a seguito di cambiamenti del portale regionale
 
-= 1.3 05.03.2017 =
+= 1.3 2017-03-05 =
 * Aggiornato sistema di scraping per il nuovo portale regionale
 * Miglioramenti vari e bugfix
 
-= 1.0 29.07.2016 =
+= 1.0 2016-07-29 =
 * First wordpress.org release
