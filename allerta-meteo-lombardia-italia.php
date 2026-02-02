@@ -16,120 +16,68 @@ add_action('admin_init', function() {
         update_option( 'amli_version_number', $new_version );
     }
 
+    // --- MANUTENZIONE CRON (Self-Healing) ---
+    $freq = get_option( 'amli_cron_frequency' );
+    $valid_schedules = array('hourly', 'twicedaily', 'daily', 'manual');
+
+    // 2. Allineamento tra Opzione e Evento Cron reale
+    if ( $freq && $freq !== 'manual' ) {
+        $is_scheduled = wp_next_scheduled( 'amli_cron_event' );
+        $current_schedule = wp_get_schedule( 'amli_cron_event' );
+        
+        // Se non è schedulato O è schedulato con una frequenza diversa da quella scelta
+        if ( !$is_scheduled || $current_schedule !== $freq ) {
+            wp_clear_scheduled_hook( 'amli_cron_event' );
+            wp_schedule_event( time(), $freq, 'amli_cron_event' );
+        }
+    } elseif ( $freq === 'manual' ) {
+        // Se è manuale, rimuovi eventuali cron attivi
+        if ( wp_next_scheduled( 'amli_cron_event' ) ) {
+            wp_clear_scheduled_hook( 'amli_cron_event' );
+        }
+    }
+
 });
 
-function amli_short( $atts ) {
-    // Create new instance of shortcode class
-    require_once 'class-shortcode.php';
-    $shortcode = new AMLI_Shortcode();
-    return $shortcode->render_shortcode($atts);
+// Hook per l'evento Cron
+add_action( 'amli_cron_event', 'amli_cron_exec' );
+function amli_cron_exec() {
+    amli_scrape( true );
 }
-add_shortcode('amli', 'amli_short');
+
+// Gestione attivazione/disattivazione Cron al cambio opzione
+add_action( 'update_option_amli_cron_frequency', function( $old_value, $value ) {
+    wp_clear_scheduled_hook( 'amli_cron_event' );
+    if ( $value && $value !== 'manual' ) {
+         if ( ! wp_next_scheduled( 'amli_cron_event' ) ) {
+            wp_schedule_event( time(), $value, 'amli_cron_event' );
+        }
+    }
+}, 10, 2 );
+
+// Pulizia allo spegnimento
+register_deactivation_hook( __FILE__, 'amli_deactivate' );
+function amli_deactivate() {
+    wp_clear_scheduled_hook( 'amli_cron_event' );
+}
+
+// Load Classes
+require_once plugin_dir_path(__FILE__) . 'classes/class-amli-zones.php';
+require_once plugin_dir_path(__FILE__) . 'classes/class-amli-scraper.php';
+require_once plugin_dir_path(__FILE__) . 'classes/class-shortcode.php';
+require_once plugin_dir_path(__FILE__) . 'classes/class-amli-admin.php';
 
 function amli_scrape( $force = false ) {
-
-    $old_timestamp = get_option( 'amli_last_update' );
-
-    if ( !$force ) {
-        if ( $old_timestamp && ( $old_timestamp > ( current_time( 'timestamp' )-20*60) ) ) {
-            return;
-        }
-    }
-
-    $url = 'https://www.allertalom.regione.lombardia.it/lista-zone';
-    
-    $risks_id_array = array(
-        'temporali' => 7,
-        'vento' => 8,
-        'idrogeologico' => 9,
-        'idraulico' => 10
-    );
-
-    $rischi_zone = array();
-
-    foreach ( $risks_id_array as $key => $risk ) {
-        $request_url = add_query_arg( 'cdTipologiaGis', $risk, $url );
-
-        // Detect local environment
-        $site_url = get_site_url();
-        $is_local = (
-            strpos($site_url, 'localhost') !== false ||
-            strpos($site_url, '127.0.0.1') !== false ||
-            strpos($site_url, '.local') !== false
-        );
-
-        $args = array( 'timeout' => 15 );
-        if ( $is_local ) {
-            $args['sslverify'] = false;
-        }
-        $args['sslverify'] = false;
-
-        $response = wp_remote_get( $request_url, $args );
-        if ( is_wp_error( $response ) ) {
-            continue;
-        }
-        $response_xml_data = wp_remote_retrieve_body( $response );
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($response_xml_data);
-        if (!$xml) {
-            continue;
-        }
-        foreach($xml->item as $item) {
-            $codiceZonaOmogenea = (string)$item->codiceZonaOmogenea;
-            $codiceZonaOmogenea = str_replace( 'IM-', '', $codiceZonaOmogenea );
-            if ( !isset( $rischi_zone[ $codiceZonaOmogenea ] ) ) {
-                $rischi_zone[ $codiceZonaOmogenea ] = array();
-            }
-            if ( !isset( $rischi_zone[ $codiceZonaOmogenea ][ $key ] ) ) {
-                $rischi_zone[ $codiceZonaOmogenea ][ $key ] = (string)$item->cdLivello;
-            }
-        }
-    }
-
-    /*
-    echo '<pre>';
-    print_r( $rischi_zone );
-    echo '</pre>';
-    die();
-    */
-    foreach( $rischi_zone as $key => $risk ) {
-        $id = $key;
-        if ( get_option( 'amli_'.$id ) != $risk ) {
-            update_option( 'amli_'.$id, $risk);
-            do_action( 'amli_weather_change', $id, $risk );
-        }
-    }
-    update_option( 'amli_last_update', current_time( 'timestamp' ) );
-
-    return;
+    $scraper = new AMLI_Scraper();
+    $scraper->scrape_all( $force );
 }
 
+/**
+ * Funzione legacy per compatibilità
+ * @deprecated Usa AMLI_Zone_Manager::get_zone_meteo
+ */
 function amli_get_paesi( $zona_id = 0 ) {
-    $zone = array(
-        array( '01', 'Valchiavenna' ),
-        array( '02', 'Media-Bassa Valtellina' ),
-        array( '03', 'Alta Valtellina' ),
-        array( '04', 'Laghi e Prealpi Varesine' ),
-        array( '05', 'Lario e Prealpi Occidentali' ),
-        array( '06', 'Orobie Bergamasche' ),
-        array( '07', 'Valcamonica' ),
-        array( '08', 'Laghi e Prealpi Orientali' ),
-        array( '09', 'Nodo Idraulico di Milano' ),
-        array( '10', 'Pianura Centrale' ),
-        array( '11', 'Alta Pianura Orientale' ),
-        array( '12', 'Bassa Pianura Occidentale' ),
-        array( '13', 'Bassa Pianura Centro-Occidentale' ),
-        array( '14', 'Bassa Pianura Centro-Orientale' ),
-        array( '15', 'Bassa Pianura Orientale' ),
-        array( '16', 'Appennino Pavese' )
-    );
-
-    if ( $zona_id ) {
-        $zona_id = ((int)$zona_id)-1;
-        return isset($zone[$zona_id]) ? $zone[$zona_id][1] : '';
-    } else {
-        return $zone;
-    }
+    return AMLI_Zone_Manager::get_zone_meteo( $zona_id );
 }
 
 function amli_get_alert_display( $int ){
@@ -145,10 +93,21 @@ function amli_get_alert_display( $int ){
     }
 }
 
-// require the admin class
-require_once plugin_dir_path(__FILE__) . 'class-amli-admin.php';
-
 // Initialize admin page
 if (is_admin()) {
     new AMLI_Admin();
+}
+
+// Add links to plugin listing
+add_filter( 'plugin_row_meta', 'amli_plugin_meta_links', 10, 2 );
+function amli_plugin_meta_links( $links, $file ) {
+    $plugin_file = plugin_basename( __FILE__ );
+    if ( $file == $plugin_file ) {
+        $row_meta = array(
+            'docs'    => '<a href="' . esc_url( 'https://wordpress.org/plugins/allerta-meteo-lombardia-italia/' ) . '" target="_blank" aria-label="' . esc_attr__( 'Plugin Page', 'amli' ) . '">' . esc_html__( 'Pagina Plugin', 'amli' ) . '</a>',
+            'author'  => '<a href="' . esc_url( 'https://profiles.wordpress.org/milmor/' ) . '" target="_blank" aria-label="' . esc_attr__( 'Developer', 'amli' ) . '">' . esc_html__( 'www.marcomilesi.com', 'amli' ) . '</a>',
+        );
+        $links = array_merge( $links, $row_meta );
+    }
+    return $links;
 }

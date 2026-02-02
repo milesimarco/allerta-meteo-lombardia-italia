@@ -1,37 +1,39 @@
 ﻿=== Allerta Meteo Lombardia ===
 Contributors: Milmor
-Version: 2.0.1
-Stable tag: 2.0.1
+Version: 2.1
+Stable tag: 2.1
 Author: Marco Milesi
 Author URI: https://profiles.wordpress.org/milmor/
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F2JK36SCXKTE2
-Tags: allerta, meteo, lombardia, italia, weather, alerts
-Requires at least: 3.8
+Tags: allerta, meteo, lombardia, italia, protezione civile
+Requires at least: 5.0
 Tested up to: 6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Sistema avanzato per la visualizzazione delle allerte meteo ufficiali della Regione Lombardia.
+Sistema avanzato e completo per la visualizzazione delle allerte ufficiali di Regione Lombardia: Idro-Meteo, Neve, Valanghe e Incendi Boschivi.
 
 == Description ==
 
-> This plugin is developed and intended to be used in Italy.
+> Questo plugin è sviluppato per essere utilizzato in Italia, specificamente per la Regione Lombardia.
 
-Allerta Meteo Lombardia permette di visualizzare in tempo reale lo stato delle allerte meteo emesse da Regione Lombardia, tramite una tabella chiara che mostra i rischi per ogni zona omogenea:
+**Allerta Meteo Lombardia** integra nel tuo sito WordPress i dati ufficiali di Protezione Civile Regione Lombardia, offrendo una panoramica completa e aggiornata dei rischi ambientali.
 
-- Idrogeologico
-- Idraulico
-- Temporali forti
-- Vento forte
+Supporta **tutti i rischi monitorati**:
 
-L'elenco dei comuni e delle relative zone omogenee è disponibile nella [D.g.r. del 17 dicembre 2015](https://goo.gl/ZnShtr).
+*   ⛈️ **Idro-Meteo:** Idrogeologico, Idraulico, Temporali forti, Vento forte
+*   ❄️ **Neve:** Criticità per nevicate in pianura e montagna
+*   🏔️ **Valanghe:** Pericolo valanghe nelle zone alpine
+*   🔥 **Incendi Boschivi:** Rischio incendi
 
-**Funzionalità principali:**
-- Shortcode personalizzabile per mostrare le allerte di una specifica zona
-- Dashboard amministrativa per monitorare tutte le allerte
-- Nuova codifica zone aggiornata secondo le direttive regionali
-- Design moderno e responsive
-- Sicurezza migliorata
+### Nuove Funzionalità (v2.1)
+*   **Shortcode Builder Visivo:** Crea i tuoi shortcode facilmente dal pannello di amministrazione con anteprima in tempo reale.
+*   **Supporto Multi-Rischio:** Combina più rischi (es. Meteo + Neve) in un'unica tabella compatta.
+*   **Previsioni:** Visualizza l'evoluzione dell'allerta con indicazioni di trend (in peggioramento/miglioramento) e orari di validità.
+*   **Dashboard Rinnovata:** Monitora la situazione a colpo d'occhio direttamente dal backend, con modali per copiare rapidamente gli shortcode.
+*   **Gestione Zone Semplificata:** Supporto completo per le diverse zonazioni (Zone IM, Zone NV, Zone Incendi, etc.).
+
+L'elenco dei comuni e delle relative zone omogenee è disponibile sui canali ufficiali di Regione Lombardia.
 
 **Risorse utili:**
 - [Istruzioni di installazione](https://wordpress.org/plugins/allerta-meteo-lombardia-italia/installation)
@@ -42,22 +44,37 @@ L'elenco dei comuni e delle relative zone omogenee è disponibile nella [D.g.r. 
 
 1. Carica la cartella `allerta-meteo-lombardia-italia` nella directory `/wp-content/plugins/` del tuo sito WordPress.
 2. Attiva il plugin dal menu 'Plugin' di WordPress.
-3. Inserisci lo shortcode desiderato nelle tue pagine o articoli.
+3. Vai nel menu "Allerta Meteo" -> "Shortcode Builder" per generare il codice da inserire nelle tue pagine.
 
 == Frequently Asked Questions ==
 
-= Quali shortcode sono disponibili? =
-Puoi mostrare i dati di allerta meteo con lo shortcode:
-``[amli id="XX"]``
-dove XX è il numero dell'area omogenea identificata da Regione Lombardia nel [D.g.r. del 17 dicembre 2015](https://goo.gl/ZnShtr) (es: 01, 02, ... 13, 14).
+= Come genero gli shortcode? =
+Il modo più semplice è usare lo **Shortcode Builder** incluso nel plugin. Seleziona le zone, i rischi e le opzioni grafiche e copia il codice generato.
 
-= Dove trovo la lista delle zone e dei comuni? =
-Consulta la [D.g.r. del 17 dicembre 2015](https://goo.gl/ZnShtr) per l'elenco aggiornato.
+= Qual è la sintassi manuale dello shortcode? =
+Puoi usare il nuovo formato semplificato.
+Esempi:
+*   Solo Meteo (Idro-Meteo): `[amli idrometeo="09"]` (dove 09 è il codice zona, es. Nodo Idraulico di Milano)
+*   Meteo + Neve: `[amli idrometeo="01" neve="01"]`
+*   Tutti i rischi: `[amli idrometeo="03" neve="03" valanghe="15" incendi="03"]`
+*   Con previsioni: Aggiungi `previsioni="1"`
+
+= Il vecchio parametro `id="..."` funziona ancora? =
+Sì, per retrocompatibilità `id="XX"` viene interpretato come `idrometeo="XX"`. Tuttavia consigliamo di aggiornare i vecchi shortcode.
 
 = Il plugin funziona solo in Lombardia? =
-Sì, il plugin è specifico per le allerte meteo della Regione Lombardia.
+Sì, il plugin è specifico per i dati emessi dalla Protezione Civile della Regione Lombardia.
 
 == Changelog ==
+
+= 2.1 2026-02-02 =
+* NEW: Shortcode Builder with Live Preview
+* NEW: Support for Snow (Neve), Avalanches (Valanghe), and Forest Fires (Incendi) alerts
+* NEW: Unified table visualization for mixed risks
+* NEW: Forecast integration with trend indicators
+* NEW: Admin Dashboard revamp with quick-copy Modals
+* UPDATE: Refactored codebase structure
+* FIX: Improved scraper reliability for "Incendi" data
 
 = 2.0 2025-05-28 =
 * Compatibility check
